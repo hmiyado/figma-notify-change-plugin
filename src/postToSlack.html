@@ -1,0 +1,32 @@
+<script>
+    let slackUrl = ''
+    function postToSlack(slackUrl) {
+        fetch(slackUrl, {
+            method: 'POST',
+            headers: {
+                // https://stackoverflow.com/questions/45752537/slack-incoming-webhook-request-header-field-content-type-is-not-allowed-by-acce
+                // Avoid CORS error
+                // Slack doesn't handle PREFLIGHT OPTIONS request
+                // 'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: 'Hello World'
+            })
+        })
+    }
+
+    window.onmessage = async (event) => {
+        const message = event.data.pluginMessage
+        switch (message.type) {
+            case 'slackUrl':
+                slackUrl = message.content
+                console.log('slackUrl', slackUrl)
+                break
+            case 'onDocumentChange':
+                const { slackUrl } = message.content
+                postToSlack(slackUrl)
+                break
+        }
+    }
+
+</script>

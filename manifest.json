@@ -1,0 +1,23 @@
+{
+  "name": "sample",
+  "id": "1216203457827189716",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "editorType": [
+    "figma"
+  ],
+  "parameters": [
+    {
+      "name": "slackWebhookUrl",
+      "key":"slackWebhookUrl",
+      "description": "Slack Incoming Webhook URL to notify Figma changes",
+      "allowFreeform": true,
+      "optional": false
+    }
+  ],
+  "ui": {
+    "postToSlack": "src/postToSlack.html"
+  }
+}
