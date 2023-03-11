@@ -9,19 +9,21 @@ figma.on('run', ({ parameters }) => {
   figma.clientStorage.setAsync(KeySlackWebhookUrl, slackWehookUrl)
 })
 
+async function postToSlack() {
+  const slackWebhookUrl = await figma.clientStorage.getAsync(KeySlackWebhookUrl)
+  figma.ui.postMessage({
+    type: 'onDocumentChange',
+    content: {
+      slackWebhookUrl,
+    }
+  })
+}
+
 figma.on('documentchange', (event) => {
   (async () => {
-    for (const changes of event.documentChanges) {
-      console.log(changes)
-      const slackWebhookUrl = await figma.clientStorage.getAsync(KeySlackWebhookUrl)
-      console.log(slackWebhookUrl)
-      figma.ui.postMessage({
-        type: 'onDocumentChange',
-        content: {
-          slackWebhookUrl,
-          changes
-        }
-      })
+    for (const change of event.documentChanges) {
+      console.log(change)
+      await postToSlack()
     }
   })()
 })
