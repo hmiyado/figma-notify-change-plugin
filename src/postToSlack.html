@@ -1,7 +1,6 @@
 <script>
-    let slackUrl = ''
-    function postToSlack(slackUrl) {
-        fetch(slackUrl, {
+    function postToSlack(slackWebhookUrl) {
+        fetch(slackWebhookUrl, {
             method: 'POST',
             headers: {
                 // https://stackoverflow.com/questions/45752537/slack-incoming-webhook-request-header-field-content-type-is-not-allowed-by-acce
@@ -18,13 +17,9 @@
     window.onmessage = async (event) => {
         const message = event.data.pluginMessage
         switch (message.type) {
-            case 'slackUrl':
-                slackUrl = message.content
-                console.log('slackUrl', slackUrl)
-                break
             case 'onDocumentChange':
-                const { slackUrl } = message.content
-                postToSlack(slackUrl)
+                const { slackWebhookUrl } = message.content
+                postToSlack(slackWebhookUrl)
                 break
         }
     }
