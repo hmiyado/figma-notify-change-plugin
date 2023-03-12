@@ -1,6 +1,6 @@
 {
   "name": "figma-notify-change-plugin",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Notify figma changes to slack",
   "main": "code.js",
   "scripts": {

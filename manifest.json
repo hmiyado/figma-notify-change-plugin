@@ -1,7 +1,7 @@
 {
   "name": "notify-change",
   "id": "1216203457827189716",
-  "api": "0.0.1",
+  "api": "1.0.0",
   "main": "dist/code.js",
   "capabilities": [],
   "enableProposedApi": false,
