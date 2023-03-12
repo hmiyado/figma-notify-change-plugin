@@ -48,7 +48,9 @@ export const NodeToPayloadConverter = {
             nodeType: node.type,
             id: node.id,
             name: node.name,
-            changeProperties: changedProperties.map((p) => p.toString()),
+            changeProperties: Object.fromEntries(changedProperties.map((p) => {
+                return [p.toString(), (node as any)[p].toString()]
+            })),
             frame: toFramePayload(parentFrame),
         }
     },

@@ -6,7 +6,9 @@ export type CreatePayload = {
 
 export type ChangePayload = {
     type: 'PROPERTY_CHANGE'
-    changeProperties: string[]
+    changeProperties: {
+        [key: string]: string
+    }
 } & NodePayload
 
 export type DeletePayload = {
@@ -44,7 +46,7 @@ export function convertPayloadsToText(payloads: Payload[]): string {
         }
         if (p.type === 'PROPERTY_CHANGE') {
             const head = getHead(':pencil2:', p)
-            const body = ` ${p.changeProperties.join(', ')}`
+            const body = Object.entries(p.changeProperties).reduce((acc, v) => `${acc}\n${v[0]}: ${v[1]}`, '')
             return `${head}\n${body}`
         }
         return ''
