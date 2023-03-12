@@ -1,14 +1,14 @@
 {
-  "name": "sample",
-  "version": "1.0.0",
-  "description": "Your Figma Plugin",
+  "name": "figma-notify-change-plugin",
+  "version": "0.0.1",
+  "description": "Notify figma changes to slack",
   "main": "code.js",
   "scripts": {
     "build": "webpack",
     "watch": "npm run build -- --watch"
   },
-  "author": "",
-  "license": "",
+  "author": "hmiyado",
+  "license": "MIT",
   "devDependencies": {
     "@figma/plugin-typings": "*",
     "ts-loader": "^9.4.2",
