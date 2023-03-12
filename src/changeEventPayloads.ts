@@ -1,4 +1,4 @@
-export type Payload = CreatePayload | DeletePayload | ChangePayload
+export type Payload = CreatePayload | DeletePayload | ChangePayload | DeletePayloadWithPreviousNode
 export type CreatePayload = {
     type: 'CREATE'
     nodeType: NodeType
@@ -18,6 +18,14 @@ export type DeletePayload = {
     type: 'DELETE'
     id: string
 }
+export type DeletePayloadWithPreviousNode = DeletePayload & {
+    previousNode: {
+        version: string
+        name: string
+        nodeType: NodeType
+        frame?: FramePayload
+    }
+}
 
 export type FramePayload = {
     name: string
@@ -27,6 +35,9 @@ export type FramePayload = {
 export function convertPayloadsToText(payloads: Payload[]): string {
     const text = payloads.map((p) => {
         if (p.type === 'DELETE') {
+            if ('previousNode' in p) {
+                return `:wastebasket: ${p.previousNode.name} (${p.previousNode.nodeType}) < ${convertFramePayloadToText(p.previousNode.frame)}`
+            }
             return `:wastebasket: ${p.id}`
         }
         if (p.type === 'CREATE') {

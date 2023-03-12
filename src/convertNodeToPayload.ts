@@ -1,4 +1,5 @@
-import { FramePayload, Payload } from "./changeEventPayloads"
+import { DeletePayloadWithPreviousNode, FramePayload, Payload } from "./changeEventPayloads"
+import { WebApiRepository } from "./webApi/webApiRepository"
 
 function getNearestParentFrame(node: (BaseNode & ChildrenMixin) | SceneNode): FrameNode | undefined {
     if (node.type === 'FRAME') {
@@ -24,7 +25,7 @@ function toFramePayload(frame: FrameNode | undefined): FramePayload | undefined 
 }
 
 export const NodeToPayloadConverter = {
-    toCreateNode(node: SceneNode | RemovedNode): Payload {
+    async toCreateNode(node: SceneNode | RemovedNode): Promise<Payload> {
         if (node.removed) {
             return this.toDeleteNode(node)
         }
@@ -37,7 +38,7 @@ export const NodeToPayloadConverter = {
             frame: toFramePayload(parentFrame),
         }
     },
-    toChangeNode(node: SceneNode | RemovedNode, changedProperties: NodeChangeProperty[]): Payload {
+    async toChangeNode(node: SceneNode | RemovedNode, changedProperties: NodeChangeProperty[]): Promise<Payload> {
         if (node.removed) {
             return this.toDeleteNode(node)
         }
@@ -51,10 +52,31 @@ export const NodeToPayloadConverter = {
             frame: toFramePayload(parentFrame),
         }
     },
-    toDeleteNode(node: SceneNode | RemovedNode): Payload {
-        return {
+    async toDeleteNode(node: SceneNode | RemovedNode): Promise<Payload> {
+        const previoousVersion = await WebApiRepository.fetchPreviousVersion()
+        if (previoousVersion === null) {
+            return {
+                type: 'DELETE',
+                id: node.id,
+            }
+        }
+        const previousNodes = await WebApiRepository.fetchNodes({ ids: [node.id], version: previoousVersion })
+        const previousNode = previousNodes[node.id]
+        if (!previousNode) {
+            return {
+                type: 'DELETE',
+                id: node.id,
+            }
+        }
+        const payload: DeletePayloadWithPreviousNode = {
             type: 'DELETE',
             id: node.id,
+            previousNode: {
+                version: previoousVersion,
+                name: previousNode.document.name,
+                nodeType: previousNode.document.type,
+            },
         }
+        return payload
     }
 }

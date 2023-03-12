@@ -33,19 +33,19 @@ figma.on('documentchange', (event) => {
       }
       if (change.type === 'CREATE') {
         const payload = NodeToPayloadConverter.toCreateNode(change.node)
-        payloads.push(payload)
+        payloads.push(await payload)
         continue
       }
       if (change.type === 'PROPERTY_CHANGE') {
         const node = change.node
         const payload = NodeToPayloadConverter.toChangeNode(node, change.properties)
-        payloads.push(payload)
+        payloads.push(await payload)
         continue
       }
       if (change.type === 'DELETE') {
         const node = change.node
         const payload = NodeToPayloadConverter.toDeleteNode(node)
-        payloads.push(payload)
+        payloads.push(await payload)
       }
     }
     const text = convertPayloadsToText(payloads)
