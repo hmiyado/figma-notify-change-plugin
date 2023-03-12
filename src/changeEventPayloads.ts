@@ -4,7 +4,7 @@ export type CreatePayload = {
     nodeType: NodeType
     id: string
     name: string
-    frame?: string
+    frame?: FramePayload
 }
 export type ChangePayload = {
     type: 'PROPERTY_CHANGE'
@@ -12,13 +12,17 @@ export type ChangePayload = {
     id: string
     name: string
     changeProperties: string[]
-    frame?: string
+    frame?: FramePayload
 }
 export type DeletePayload = {
     type: 'DELETE'
     id: string
 }
 
+export type FramePayload = {
+    name: string
+    link: string
+}
 
 export function convertPayloadsToText(payloads: Payload[]): string {
     const text = payloads.map((p) => {
@@ -26,12 +30,19 @@ export function convertPayloadsToText(payloads: Payload[]): string {
             return `:wastebasket: ${p.id}`
         }
         if (p.type === 'CREATE') {
-            return `:new: ${p.name} (${p.nodeType})`
+            return `:new: ${p.name} (${p.nodeType}) < ${convertFramePayloadToText(p.frame)}`
         }
         if (p.type === 'PROPERTY_CHANGE') {
-            return `:pencil2: ${p.name} (${p.nodeType}) ${p.changeProperties.join(', ')}`
+            return `:pencil2: ${p.name} (${p.nodeType}) ${p.changeProperties.join(', ')} < ${convertFramePayloadToText(p.frame)}`
         }
         return ''
     }).join('\n')
     return text
+}
+
+function convertFramePayloadToText(frame: FramePayload | undefined): string {
+    if (frame === undefined) {
+        return '[No Parent Frame]'
+    }
+    return `<${frame.link}|${frame.name}>`
 }

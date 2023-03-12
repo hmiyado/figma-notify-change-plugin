@@ -5,6 +5,7 @@
   "main": "dist/code.js",
   "capabilities": [],
   "enableProposedApi": false,
+  "enablePrivatePluginApi": true,
   "editorType": [
     "figma"
   ],
@@ -20,13 +21,6 @@
       "name": "figmaPersonalAccessToken",
       "key": "figmaPersonalAccessToken",
       "description": "Figma Personal Access Token to access Figma API",
-      "allowFreeform": true,
-      "optional": false
-    },
-    {
-      "name": "figmaFileKey",
-      "key": "figmaFileKey",
-      "description": "Figma file key. https://www.figma.com/file/:figmaFileKey/:figmaFileName",
       "allowFreeform": true,
       "optional": false
     }

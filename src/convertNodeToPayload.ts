@@ -1,13 +1,26 @@
-import { Payload } from "./changeEventPayloads"
+import { FramePayload, Payload } from "./changeEventPayloads"
 
-function getNearestParentFrame(node: (BaseNode & ChildrenMixin) | SceneNode): FrameNode | null {
+function getNearestParentFrame(node: (BaseNode & ChildrenMixin) | SceneNode): FrameNode | undefined {
     if (node.type === 'FRAME') {
         return node
     }
     if (node.parent === null) {
-        return null
+        return undefined
     }
     return getNearestParentFrame(node.parent)
+}
+
+function getFrameLink(frame: FrameNode | undefined): string {
+    if (frame === undefined) { return '' }
+    return `https://www.figma.com/file/${figma.fileKey}/${figma.root.name}?node-id=${encodeURIComponent(frame.id)}`
+}
+
+function toFramePayload(frame: FrameNode | undefined): FramePayload | undefined {
+    if (frame === undefined) { return undefined }
+    return {
+        name: frame.name,
+        link: getFrameLink(frame),
+    }
 }
 
 export const NodeToPayloadConverter = {
@@ -21,7 +34,7 @@ export const NodeToPayloadConverter = {
             nodeType: node.type,
             id: node.id,
             name: node.name,
-            frame: parentFrame?.name,
+            frame: toFramePayload(parentFrame),
         }
     },
     toChangeNode(node: SceneNode | RemovedNode, changedProperties: NodeChangeProperty[]): Payload {
@@ -35,7 +48,7 @@ export const NodeToPayloadConverter = {
             id: node.id,
             name: node.name,
             changeProperties: changedProperties.map((p) => p.toString()),
-            frame: parentFrame?.name,
+            frame: toFramePayload(parentFrame),
         }
     },
     toDeleteNode(node: SceneNode | RemovedNode): Payload {
