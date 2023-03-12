@@ -1,4 +1,5 @@
-import { CreatePayload, Payload, convertPayloadsToText } from './changeEventPayloads'
+import { Payload, convertPayloadsToText } from './changeEventPayloads'
+import { NodeToPayloadConverter } from './convertNodeToPayload'
 
 const KeySlackWebhookUrl = 'slackWebhookUrl'
 
@@ -31,64 +32,23 @@ figma.on('documentchange', (event) => {
         continue
       }
       if (change.type === 'CREATE') {
-        const node = change.node
-        if (node.removed) {
-          payloads.push({
-            type: 'DELETE',
-            id: node.id,
-          })
-          continue
-        }
-        const parentFrame = getNearestParentFrame(node)
-        const payload: CreatePayload = {
-          type: 'CREATE',
-          nodeType: node.type,
-          id: node.id,
-          name: node.name,
-          frame: parentFrame?.name,
-        }
+        const payload = NodeToPayloadConverter.toCreateNode(change.node)
         payloads.push(payload)
         continue
       }
       if (change.type === 'PROPERTY_CHANGE') {
         const node = change.node
-        if (node.removed) {
-          payloads.push({
-            type: 'DELETE',
-            id: node.id,
-          })
-          continue
-        }
-        const parentFrame = getNearestParentFrame(node)
-        const payload: Payload = {
-          type: change.type,
-          nodeType: node.type,
-          id: node.id,
-          name: node.name,
-          changeProperties: change.properties.map((p) => p.toString()),
-          frame: parentFrame?.name,
-        }
+        const payload = NodeToPayloadConverter.toChangeNode(node, change.properties)
         payloads.push(payload)
+        continue
       }
       if (change.type === 'DELETE') {
         const node = change.node
-        payloads.push({
-          type: 'DELETE',
-          id: node.id,
-        })
+        const payload = NodeToPayloadConverter.toDeleteNode(node)
+        payloads.push(payload)
       }
     }
     const text = convertPayloadsToText(payloads)
     await postToSlack(text)
   })()
 })
-
-function getNearestParentFrame(node: (BaseNode & ChildrenMixin) | SceneNode): FrameNode | null {
-  if (node.type === 'FRAME') {
-    return node
-  }
-  if (node.parent === null) {
-    return null
-  }
-  return getNearestParentFrame(node.parent)
-}
