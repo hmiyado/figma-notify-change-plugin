@@ -1,17 +1,21 @@
 <script>
-    function postToSlack(slackWebhookUrl, text) {
-        fetch(slackWebhookUrl, {
-            method: 'POST',
-            headers: {
-                // https://stackoverflow.com/questions/45752537/slack-incoming-webhook-request-header-field-content-type-is-not-allowed-by-acce
-                // Avoid CORS error
-                // Slack doesn't handle PREFLIGHT OPTIONS request
-                // 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                text: text
+    async function postToSlack(slackWebhookUrl, text) {
+        try {
+            await fetch(slackWebhookUrl, {
+                method: 'POST',
+                headers: {
+                    // https://stackoverflow.com/questions/45752537/slack-incoming-webhook-request-header-field-content-type-is-not-allowed-by-acce
+                    // Avoid CORS error
+                    // Slack doesn't handle PREFLIGHT OPTIONS request
+                    // 'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text
+                })
             })
-        })
+        } catch (error) {
+            console.log(text)
+        }
     }
 
     window.onmessage = async (event) => {
@@ -19,7 +23,7 @@
         switch (message.type) {
             case 'onDocumentChange':
                 const { slackWebhookUrl, text } = message.content
-                postToSlack(slackWebhookUrl, text)
+                await postToSlack(slackWebhookUrl, text)
                 break
         }
     }
