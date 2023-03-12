@@ -1,5 +1,7 @@
 # Figma Notify Change Plugin
 
+![example](./example.png)
+
 ## How to use
 
 1. clone this repository
