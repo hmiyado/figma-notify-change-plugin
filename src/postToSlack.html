@@ -1,5 +1,5 @@
 <script>
-    function postToSlack(slackWebhookUrl) {
+    function postToSlack(slackWebhookUrl, text) {
         fetch(slackWebhookUrl, {
             method: 'POST',
             headers: {
@@ -9,7 +9,7 @@
                 // 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                text: 'Hello World'
+                text: text
             })
         })
     }
@@ -18,8 +18,8 @@
         const message = event.data.pluginMessage
         switch (message.type) {
             case 'onDocumentChange':
-                const { slackWebhookUrl } = message.content
-                postToSlack(slackWebhookUrl)
+                const { slackWebhookUrl, text } = message.content
+                postToSlack(slackWebhookUrl, text)
                 break
         }
     }
