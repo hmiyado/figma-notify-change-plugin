@@ -1,19 +1,19 @@
 import { Payload, convertPayloadsToText } from './changeEventPayloads'
 import { NodeToPayloadConverter } from './convertNodeToPayload'
-
-const KeySlackWebhookUrl = 'slackWebhookUrl'
+import { FigmaParameter } from './figmaParameter'
 
 figma.showUI(__uiFiles__.postToSlack, {
   visible: false
 })
 figma.on('run', ({ parameters }) => {
-  const slackWehookUrl = parameters?.[KeySlackWebhookUrl]
-  console.log(slackWehookUrl)
-  figma.clientStorage.setAsync(KeySlackWebhookUrl, slackWehookUrl)
+  if (!parameters) {
+    return
+  }
+  FigmaParameter.initWithParameters(parameters)
 })
 
 async function postToSlack(text: string) {
-  const slackWebhookUrl = await figma.clientStorage.getAsync(KeySlackWebhookUrl)
+  const slackWebhookUrl = await FigmaParameter.slackWebhookUrl()
   figma.ui.postMessage({
     type: 'onDocumentChange',
     content: {
