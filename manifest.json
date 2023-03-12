@@ -15,6 +15,20 @@
       "description": "Slack Incoming Webhook URL to notify Figma changes",
       "allowFreeform": true,
       "optional": false
+    },
+    {
+      "name": "figmaPersonalAccessToken",
+      "key": "figmaPersonalAccessToken",
+      "description": "Figma Personal Access Token to access Figma API",
+      "allowFreeform": true,
+      "optional": false
+    },
+    {
+      "name": "figmaFileKey",
+      "key": "figmaFileKey",
+      "description": "Figma file key. https://www.figma.com/file/:figmaFileKey/:figmaFileName",
+      "allowFreeform": true,
+      "optional": false
     }
   ],
   "ui": {
