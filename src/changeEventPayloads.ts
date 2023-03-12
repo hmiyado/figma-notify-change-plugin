@@ -1,30 +1,21 @@
 export type Payload = CreatePayload | DeletePayload | ChangePayload | DeletePayloadWithPreviousNode
+
 export type CreatePayload = {
     type: 'CREATE'
-    nodeType: NodeType
-    id: string
-    name: string
-    frame?: FramePayload
-}
+} & NodePayload
+
 export type ChangePayload = {
     type: 'PROPERTY_CHANGE'
-    nodeType: NodeType
-    id: string
-    name: string
     changeProperties: string[]
-    frame?: FramePayload
-}
+} & NodePayload
+
 export type DeletePayload = {
     type: 'DELETE'
     id: string
 }
+
 export type DeletePayloadWithPreviousNode = DeletePayload & {
-    previousNode: {
-        version: string
-        name: string
-        nodeType: NodeType
-        frame?: FramePayload
-    }
+    previousNode: NodePayload
 }
 
 export type FramePayload = {
@@ -32,19 +23,29 @@ export type FramePayload = {
     link: string
 }
 
+type NodePayload = {
+    id: string
+    nodeType: NodeType
+    name: string
+    frame?: FramePayload
+    version?: string
+}
+
 export function convertPayloadsToText(payloads: Payload[]): string {
     const text = payloads.map((p) => {
         if (p.type === 'DELETE') {
             if ('previousNode' in p) {
-                return `:wastebasket: ${p.previousNode.name} (${p.previousNode.nodeType}) < ${convertFramePayloadToText(p.previousNode.frame)}`
+                return getHead(':wastebasket:', p.previousNode)
             }
             return `:wastebasket: ${p.id}`
         }
         if (p.type === 'CREATE') {
-            return `:new: ${p.name} (${p.nodeType}) < ${convertFramePayloadToText(p.frame)}`
+            return getHead(':new:', p)
         }
         if (p.type === 'PROPERTY_CHANGE') {
-            return `:pencil2: ${p.name} (${p.nodeType}) ${p.changeProperties.join(', ')} < ${convertFramePayloadToText(p.frame)}`
+            const head = getHead(':pencil2:', p)
+            const body = ` ${p.changeProperties.join(', ')}`
+            return `${head}\n${body}`
         }
         return ''
     }).join('\n')
@@ -55,5 +56,19 @@ function convertFramePayloadToText(frame: FramePayload | undefined): string {
     if (frame === undefined) {
         return '[No Parent Frame]'
     }
-    return `<${frame.link}|${frame.name}>`
+    return toSlackLink(frame.name, frame.link)
+}
+
+function getHead(icon: string, node: NodePayload): string {
+    const presentation = `${node.name}: ${node.nodeType}`
+    return `${icon} ${toSlackLink(presentation, getNodeLink(node.id, node.version))} < ${convertFramePayloadToText(node.frame)}`
+}
+
+function getNodeLink(id: string, version?: string): string {
+    const versionParam = version ? `&version-id=${version}` : ''
+    return `https://www.figma.com/file/${figma.fileKey}/${figma.root.name}?node-id=${encodeURIComponent(id)}${versionParam}`
+}
+
+function toSlackLink(text: string, link: string): string {
+    return `<${link}|${text}>`
 }

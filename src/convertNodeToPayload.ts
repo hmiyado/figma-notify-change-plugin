@@ -72,6 +72,7 @@ export const NodeToPayloadConverter = {
             type: 'DELETE',
             id: node.id,
             previousNode: {
+                id: node.id,
                 version: previoousVersion,
                 name: previousNode.document.name,
                 nodeType: previousNode.document.type,
