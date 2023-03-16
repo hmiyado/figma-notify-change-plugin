@@ -1,4 +1,4 @@
-import { DeletePayload, Payload, convertPayloadsToText } from './changeEventPayloads'
+import { convertPayloadsToText } from './changeEventPayloads'
 import { NodeToPayloadConverter } from './convertNodeToPayload'
 import { eventQueue } from './eventQueue'
 import { FigmaParameter } from './figmaParameter'
