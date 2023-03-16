@@ -52,37 +52,10 @@ figma.on('documentchange', (event) => {
 })
 
 setInterval(() => {
-  if (eventQueue.length() === 0) {
+  const payloads = eventQueue.dumpAllPayloads()
+  if (payloads.length === 0) {
     return
   }
-  const eventMap = new Map<string, Exclude<Payload, DeletePayload>>()
-  while (eventQueue.length() > 0) {
-    const event = eventQueue.pop()
-    if (event === undefined) { return }
-    if (event.type === 'CREATE') {
-      eventMap.set(event.id, event)
-      continue
-    }
-    if (event.type === 'DELETE') {
-      eventMap.delete(event.id)
-      continue
-    }
-    // event.type === 'PROPERTY_CHANGE'
-    if (!eventMap.has(event.id)) {
-      eventMap.set(event.id, event)
-      continue
-    }
-    const previousEvent = eventMap.get(event.id)
-    if (previousEvent === undefined) { return }
-    eventMap.set(event.id, {
-      ...previousEvent,
-      changeProperties: {
-        ...previousEvent.changeProperties,
-        ...event.changeProperties,
-      }
-    })
-  }
-  const payloads = Array.from(eventMap.values())
   const text = convertPayloadsToText(payloads)
   postToSlack(text)
 }, 60 * 1000)
