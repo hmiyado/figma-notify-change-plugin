@@ -2,6 +2,9 @@ export type Payload = CreatePayload | DeletePayload | ChangePayload | DeletePayl
 
 export type CreatePayload = {
     type: 'CREATE'
+    changeProperties?: {
+        [key: string]: string
+    }
 } & NodePayload
 
 export type ChangePayload = {
@@ -42,7 +45,11 @@ export function convertPayloadsToText(payloads: Payload[]): string {
             return `:wastebasket: ${p.id}`
         }
         if (p.type === 'CREATE') {
-            return getHead(':new:', p)
+            const body = p.changeProperties !== undefined ?
+                Object.entries(p.changeProperties).reduce((acc, v) => `${acc}\n${v[0]}: ${v[1]}`, '')
+                : ''
+            const head = getHead(':new:', p)
+            return `${head}${body !== '' ? `\n${body}` : ''}`
         }
         if (p.type === 'PROPERTY_CHANGE') {
             const head = getHead(':pencil2:', p)
